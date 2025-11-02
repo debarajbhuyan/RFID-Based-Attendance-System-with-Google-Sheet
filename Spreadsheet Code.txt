@@ -1,0 +1,38 @@
+var ss = SpreadsheetApp.openById('Enter Sheet ID');  //You can get Sheet ID from URL
+var sheet = ss.getSheetByName('Sheet1');
+var timezone = Enter Time Zone of Your Country // example: "Asia/Kolkata"
+
+function doGet(e){
+  Logger.log(JSON.stringify(e));
+  
+  // Check if name parameter exists
+  if (!e.parameter.name) {
+    return ContentService.createTextOutput("Received data is undefined");
+  }
+  
+  var Curr_Date = new Date();
+  var Curr_Time = Utilities.formatDate(Curr_Date, timezone, 'HH:mm:ss');
+  var name = stripQuotes(e.parameter.name); 
+  var nextRow = sheet.getLastRow() + 1;
+  
+  sheet.getRange("A" + nextRow).setValue(name);
+  sheet.getRange("B" + nextRow).setValue(Utilities.formatDate(Curr_Date, timezone, 'dd/MM/yyyy'));
+  sheet.getRange("C" + nextRow).setValue(Curr_Time);
+  
+  return ContentService.createTextOutput("Success: " + name + " attendance recorded");
+}
+
+function stripQuotes(value) {
+  return value.replace(/^["']|['"]$/g, "");
+}
+
+function doPost(e) {
+  var val = e.parameter.value;
+  
+  if (val !== undefined){
+    var range = sheet.getRange('A2');
+    range.setValue(val);
+  }
+  
+  return ContentService.createTextOutput("POST received");
+}
